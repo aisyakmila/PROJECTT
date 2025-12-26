@@ -86,16 +86,22 @@ if menu == "Home":
 
     st.markdown("""
     <div class="card">
-    Undertone adalah warna dasar alami kulit yang **tidak berubah** walaupun kulitmu menjadi lebih terang atau gelap.
-    
+    Undertone adalah warna dasar alami kulit yang <b>tidak berubah</b> walaupun kulitmu menjadi lebih terang atau gelap.
+    <br><br>
     Mengetahui undertone membantu kamu memilih:
-    - 💄 Makeup
-    - 👗 Warna pakaian
-    - 💍 Aksesori
+    <ul>
+        <li>💄 Makeup</li>
+        <li>👗 Warna pakaian</li>
+        <li>💍 Aksesori</li>
+    </ul>
     </div>
     """, unsafe_allow_html=True)
+
+    # JARAK BIAR GA NABRAK
     st.markdown("<br><br><br>", unsafe_allow_html=True)
+
     st.image("assets/undertone.png", use_container_width=True)
+
     st.info("👉 Klik menu **Check Undertone** di sidebar")
 
 # ================= CHECK =================
@@ -141,4 +147,5 @@ else:
             st.success(f"Undertone kamu: **{tone}**")
             st.info(f"Confidence: **{conf*100:.2f}%**")
             st.markdown("</div>", unsafe_allow_html=True)
+
 
