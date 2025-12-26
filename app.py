@@ -94,7 +94,7 @@ if menu == "Home":
     - 💍 Aksesori
     </div>
     """, unsafe_allow_html=True)
-
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.image("assets/undertone.png", use_container_width=True)
     st.info("👉 Klik menu **Check Undertone** di sidebar")
 
@@ -141,3 +141,4 @@ else:
             st.success(f"Undertone kamu: **{tone}**")
             st.info(f"Confidence: **{conf*100:.2f}%**")
             st.markdown("</div>", unsafe_allow_html=True)
+
