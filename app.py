@@ -4,197 +4,204 @@ from PIL import Image
 import tensorflow as tf
 import pickle
 
-# ======================================================
-# 🎀 PAGE CONFIG
-# ======================================================
+# ================== PAGE CONFIG ==================
 st.set_page_config(
     page_title="Undertone Finder",
     page_icon="💅🏻",
     layout="wide"
 )
 
-# ======================================================
-# 🎨 CUSTOM CSS (PINK AESTHETIC)
-# ======================================================
+# ================== GLOBAL CSS ==================
 st.markdown("""
 <style>
+.stApp {
+    background-color: #fffafc;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* SIDEBAR */
 section[data-testid="stSidebar"] {
     background-color: #ffe6f0;
+    padding-top: 20px;
 }
 
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3,
-section[data-testid="stSidebar"] label {
-    color: #d63384;
+/* SIDEBAR TEXT */
+section[data-testid="stSidebar"] * {
+    color: #b83280 !important;
+    font-weight: 500;
 }
 
+/* SELECTBOX */
 div[data-baseweb="select"] > div {
     background-color: #fff0f6;
-    border-radius: 10px;
+    border-radius: 14px;
+    border: 1px solid #ffadd2;
 }
 
-.stButton button {
-    background-color: #ff85c0;
+/* BUTTON */
+.stButton > button {
+    background: linear-gradient(90deg, #ff85c0, #ff4da6);
     color: white;
+    border-radius: 30px;
+    border: none;
+    padding: 0.6em 1.4em;
+    font-size: 16px;
+}
+
+/* BUTTON HOVER */
+.stButton > button:hover {
+    background: linear-gradient(90deg, #ff4da6, #c41d7f);
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 8px 25px rgba(255, 77, 166, 0.15);
+    margin-top: 20px;
+}
+
+/* BADGE */
+.badge {
+    display: inline-block;
+    background: #ff4da6;
+    color: white;
+    padding: 6px 14px;
     border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 10px;
 }
 
-.stButton button:hover {
-    background-color: #ff4da6;
+/* IMAGE */
+img {
+    border-radius: 18px;
 }
 
-footer {
-    visibility: hidden;
+/* FOOTER */
+.footer {
+    text-align: center;
+    color: #c41d7f;
+    margin-top: 50px;
+    font-size: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ======================================================
-# 🤖 LOAD MODEL & ENCODER
-# ======================================================
+# ================== LOAD MODEL ==================
 @st.cache_resource
 def load_model_and_encoder():
     model = tf.keras.models.load_model("model2.h5")
     with open("label_encoder2.pkl", "rb") as f:
-        encoder = pickle.load(f)
-    return model, encoder
+        label_encoder = pickle.load(f)
+    return model, label_encoder
 
 model, label_encoder = load_model_and_encoder()
 
-# ======================================================
-# 🖼️ PREPROCESS IMAGE
-# ======================================================
+# ================== FUNCTIONS ==================
 def preprocess_image(image, target_size=(64, 64)):
     image = image.resize(target_size)
     img = np.array(image).astype("float32") / 255.0
-    img = np.expand_dims(img, axis=0)
-    return img
+    return np.expand_dims(img, axis=0)
 
-# ======================================================
-# 🔮 PREDICT
-# ======================================================
 def predict(image_array):
     probs = model.predict(image_array)[0]
     idx = np.argmax(probs)
-    label = label_encoder.inverse_transform([idx])[0]
-    conf = probs[idx]
-    return label, conf
+    return label_encoder.inverse_transform([idx])[0], probs[idx]
 
-# ======================================================
-# 📚 RECOMMENDATION DATA
-# ======================================================
-recommendation = {
-    "Cool": {
-        "desc": "Undertone cool memiliki nuansa kebiruan atau pink sehingga cocok dengan warna dingin.",
-        "makeup": ["Rose", "Berry", "Mauve", "Plum"],
-        "outfit": ["Biru", "Ungu", "Abu-abu", "Silver"],
-        "img": "COOL.png"
-    },
-    "Warm": {
-        "desc": "Undertone warm memiliki nuansa kekuningan yang tampak cerah dengan warna hangat.",
-        "makeup": ["Coral", "Peach", "Terracotta"],
-        "outfit": ["Kuning", "Coklat", "Olive", "Gold"],
-        "img": "WARM.png"
-    },
-    "Neutral": {
-        "desc": "Undertone neutral seimbang antara hangat dan dingin, fleksibel untuk banyak warna.",
-        "makeup": ["Peach", "Soft Pink", "Nude"],
-        "outfit": ["Beige", "Mint", "Dusty Pink", "Cream"],
-        "img": "NEUTRAL.png"
-    }
-}
+# ================== SIDEBAR ==================
+menu = st.sidebar.selectbox(
+    "🌸 Navigasi",
+    ["HOME", "CHECK YOUR UNDERTONE"]
+)
 
-# ======================================================
-# 📌 SIDEBAR
-# ======================================================
-menu = ["HOME", "CHECK YOUR UNDERTONE HERE"]
-choice = st.sidebar.selectbox("Navigasi", menu)
-
-# ======================================================
-# 🏠 HOME
-# ======================================================
-if choice == "HOME":
-    st.markdown("## 💅🏻 Welcome to **Undertone Finder**")
+# ================== HOME ==================
+if menu == "HOME":
+    st.markdown("## 💅🏻 Undertone Finder")
     st.markdown("""
-    **Undertone Finder** adalah aplikasi berbasis AI yang membantu kamu  
-    mengetahui undertone kulit hanya dari **gambar nadi tangan**.
+    <div class="card">
+    <span class="badge">Apa itu Undertone?</span>
+    <p>
+    Undertone adalah warna dasar alami kulitmu yang tidak berubah meskipun kulitmu
+    menjadi lebih gelap atau terang.
+    </p>
 
-    ✨ Dengan mengetahui undertone, kamu bisa:
-    - Memilih warna makeup yang tepat  
-    - Menyesuaikan outfit & aksesoris  
-    - Tampil lebih glowing & confident  
-    """)
+    <b>Kenapa penting?</b>
+    <ul>
+        <li>Makeup jadi lebih nyatu</li>
+        <li>Warna baju lebih flattering</li>
+        <li>Perhiasan terlihat lebih cocok</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.image("undertone.png", use_container_width=True)
-    st.success("👉 Yuk cek undertone kamu di menu samping!")
+    st.image("undertone.png", width=450)
+    st.markdown("👉 Pilih menu <b>CHECK YOUR UNDERTONE</b> di sidebar", unsafe_allow_html=True)
 
-# ======================================================
-# 🔍 CHECK UNDERTONE
-# ======================================================
+# ================== CHECK UNDERTONE ==================
 else:
     st.markdown("## 🔍 Deteksi Undertone Kulit")
-    st.caption("Upload gambar nadi tangan atau gunakan kamera")
 
-    tab1, tab2 = st.tabs(["📁 Upload Gambar", "📷 Kamera Realtime"])
+    tab1, tab2 = st.tabs(["📁 Upload Gambar", "📷 Kamera"])
 
-    # =============================
-    # UPLOAD
-    # =============================
+    # ===== UPLOAD =====
     with tab1:
-        file = st.file_uploader("Upload gambar (jpg/png)", ["jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader(
+            "Upload gambar nadi (jpg / png)",
+            type=["jpg", "jpeg", "png"]
+        )
 
-        if file:
-            image = Image.open(file).convert("RGB")
-
-            col1, col2 = st.columns([1, 1.2])
+        if uploaded_file:
+            col1, col2 = st.columns([1, 1.4])
 
             with col1:
-                st.image(image, caption="Gambar Input", width=300)
+                image = Image.open(uploaded_file).convert("RGB")
+                st.image(image, width=260, caption="Gambar yang diupload")
 
             with col2:
-                img_arr = preprocess_image(image)
-                label, conf = predict(img_arr)
+                processed = preprocess_image(image)
+                pred, conf = predict(processed)
 
-                data = recommendation[label]
+                st.markdown(f"""
+                <div class="card">
+                <span class="badge">Hasil Deteksi</span>
+                <h3>Undertone kamu: <b>{pred}</b></h3>
+                <p>Tingkat keyakinan model: <b>{conf*100:.2f}%</b></p>
+                </div>
+                """, unsafe_allow_html=True)
 
-                st.markdown(f"### 🌈 Undertone: **{label}**")
-                st.progress(float(conf))
-                st.caption(f"Tingkat keyakinan model: **{conf*100:.2f}%**")
+                st.markdown("### 💖 Rekomendasi Warna")
+                if pred == "Cool":
+                    st.write("✔ Biru, Ungu, Abu-abu, Silver")
+                    st.image("COOL.png", width=260)
+                elif pred == "Warm":
+                    st.write("✔ Kuning, Coklat, Emas, Olive")
+                    st.image("WARM.png", width=260)
+                else:
+                    st.write("✔ Beige, Peach, Pink, Mint")
+                    st.image("NEUTRAL.png", width=260)
 
-                st.markdown(f"**Kenapa?** {data['desc']}")
-
-                st.markdown("### 💄 Rekomendasi Makeup")
-                st.write(", ".join(data["makeup"]))
-
-                st.markdown("### 👗 Rekomendasi Outfit")
-                st.write(", ".join(data["outfit"]))
-
-            st.divider()
-            st.markdown("### 🎨 Palet Warna yang Cocok")
-            st.image(data["img"], width=350)
-
-    # =============================
-    # CAMERA
-    # =============================
+    # ===== CAMERA =====
     with tab2:
-        cam = st.camera_input("Ambil gambar")
+        camera_image = st.camera_input("Ambil gambar dari kamera")
 
-        if cam:
-            image = Image.open(cam).convert("RGB")
-            img_arr = preprocess_image(image)
-            label, conf = predict(img_arr)
-            data = recommendation[label]
+        if camera_image:
+            image = Image.open(camera_image).convert("RGB")
+            st.image(image, width=260)
 
-            st.image(image, width=300)
-            st.success(f"Undertone kamu: **{label}** ({conf*100:.2f}%)")
-            st.image(data["img"], width=350)
+            processed = preprocess_image(image)
+            pred, conf = predict(processed)
 
-# ======================================================
-# 🌸 FOOTER
-# ======================================================
+            st.markdown(f"""
+            <div class="card">
+            <h3>✨ Undertone kamu: <b>{pred}</b></h3>
+            <p>Confidence: <b>{conf*100:.2f}%</b></p>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ================== FOOTER ==================
 st.markdown("""
----
-✨ **Undertone Finder** • AI Powered • Streamlit App  
-Made with 💖
-""")
+<div class="footer">
+✨ Undertone Finder · AI Powered · Streamlit App ✨
+</div>
+""", unsafe_allow_html=True)
