@@ -60,6 +60,7 @@ div[data-baseweb="select"] > div {
     border-radius: 25px;
     box-shadow: 0 8px 25px rgba(255, 77, 166, 0.15);
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 /* BADGE */
@@ -135,7 +136,6 @@ if menu == "HOME":
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-top:20px; text-align:center;'>", unsafe_allow_html=True)
     st.image("undertone.png", width=450)
     st.markdown("👉 Pilih menu <b>CHECK YOUR UNDERTONE</b> di sidebar", unsafe_allow_html=True)
 
@@ -207,5 +207,6 @@ st.markdown("""
 ✨ Undertone Finder · Streamlit App ✨
 </div>
 """, unsafe_allow_html=True)
+
 
 
