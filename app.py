@@ -171,17 +171,40 @@ else:
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.markdown("### 💖 Rekomendasi Warna")
-                pred = pred.strip().capitalize()
-                if pred == "Cool":
-                    st.write("✔ Biru, Ungu, Abu-abu, Silver")
-                    st.image("COOL.png", width=260)
-                elif pred == "Warm":
-                    st.write("✔ Kuning, Coklat, Emas, Olive")
-                    st.image("WARM.png", width=260)
-                else:
-                    st.write("✔ Beige, Peach, Pink, Mint")
-                    st.image("NEUTRAL.png", width=260)
+    st.markdown("### 💖 Rekomendasi Warna")
+
+pred = pred.strip().capitalize()
+
+if pred == "Cool":
+    st.markdown("""
+    ✔ 
+    <span style="color:#1f77b4;"><b>Biru</b></span>, 
+    <span style="color:#6a0dad;"><b>Ungu</b></span>, 
+    <span style="color:#7f7f7f;"><b>Abu-abu</b></span>, 
+    <span style="color:#c0c0c0;"><b>Silver</b></span>
+    """, unsafe_allow_html=True)
+    st.image("COOL.png", width=260)
+
+elif pred == "Warm":
+    st.markdown("""
+    ✔ 
+    <span style="color:#f1c40f;"><b>Kuning</b></span>, 
+    <span style="color:#8b4513;"><b>Coklat</b></span>, 
+    <span style="color:#d4af37;"><b>Emas</b></span>, 
+    <span style="color:#808000;"><b>Olive</b></span>
+    """, unsafe_allow_html=True)
+    st.image("WARM.png", width=260)
+
+else:
+    st.markdown("""
+    ✔ 
+    <span style="color:#d2b48c;"><b>Beige</b></span>, 
+    <span style="color:#ffb7c5;"><b>Peach</b></span>, 
+    <span style="color:#ff69b4;"><b>Pink</b></span>, 
+    <span style="color:#98ff98;"><b>Mint</b></span>
+    """, unsafe_allow_html=True)
+    st.image("NEUTRAL.png", width=260)
+
 
     # ===== CAMERA =====
     with tab2:
@@ -207,6 +230,7 @@ st.markdown("""
 ✨ Undertone Finder · Streamlit App ✨
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
