@@ -130,4 +130,71 @@ if choice == "HOME":
     st.success("👉 Yuk cek undertone kamu di menu samping!")
 
 # ======================================================
-# 🔍 CHECK UNDE
+# 🔍 CHECK UNDERTONE
+# ======================================================
+else:
+    st.markdown("## 🔍 Deteksi Undertone Kulit")
+    st.caption("Upload gambar nadi tangan atau gunakan kamera")
+
+    tab1, tab2 = st.tabs(["📁 Upload Gambar", "📷 Kamera Realtime"])
+
+    # =============================
+    # UPLOAD
+    # =============================
+    with tab1:
+        file = st.file_uploader("Upload gambar (jpg/png)", ["jpg", "jpeg", "png"])
+
+        if file:
+            image = Image.open(file).convert("RGB")
+
+            col1, col2 = st.columns([1, 1.2])
+
+            with col1:
+                st.image(image, caption="Gambar Input", width=300)
+
+            with col2:
+                img_arr = preprocess_image(image)
+                label, conf = predict(img_arr)
+
+                data = recommendation[label]
+
+                st.markdown(f"### 🌈 Undertone: **{label}**")
+                st.progress(float(conf))
+                st.caption(f"Tingkat keyakinan model: **{conf*100:.2f}%**")
+
+                st.markdown(f"**Kenapa?** {data['desc']}")
+
+                st.markdown("### 💄 Rekomendasi Makeup")
+                st.write(", ".join(data["makeup"]))
+
+                st.markdown("### 👗 Rekomendasi Outfit")
+                st.write(", ".join(data["outfit"]))
+
+            st.divider()
+            st.markdown("### 🎨 Palet Warna yang Cocok")
+            st.image(data["img"], width=350)
+
+    # =============================
+    # CAMERA
+    # =============================
+    with tab2:
+        cam = st.camera_input("Ambil gambar")
+
+        if cam:
+            image = Image.open(cam).convert("RGB")
+            img_arr = preprocess_image(image)
+            label, conf = predict(img_arr)
+            data = recommendation[label]
+
+            st.image(image, width=300)
+            st.success(f"Undertone kamu: **{label}** ({conf*100:.2f}%)")
+            st.image(data["img"], width=350)
+
+# ======================================================
+# 🌸 FOOTER
+# ======================================================
+st.markdown("""
+---
+✨ **Undertone Finder** • AI Powered • Streamlit App  
+Made with 💖
+""")
