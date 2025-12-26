@@ -171,6 +171,7 @@ else:
                 """, unsafe_allow_html=True)
 
                 st.markdown("### 💖 Rekomendasi Warna")
+                pred = pred.strip().capitalize()
                 if pred == "Cool":
                     st.write("✔ Biru, Ungu, Abu-abu, Silver")
                     st.image("COOL.png", width=260)
@@ -202,6 +203,7 @@ else:
 # ================== FOOTER ==================
 st.markdown("""
 <div class="footer">
-✨ Undertone Finder · AI Powered · Streamlit App ✨
+✨ Undertone Finder · Streamlit App ✨
 </div>
 """, unsafe_allow_html=True)
+
