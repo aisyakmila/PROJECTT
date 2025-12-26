@@ -141,7 +141,7 @@ else:
             col1, col2 = st.columns([1, 1.4])
             with col1:
                 img = Image.open(file).convert("RGB")
-                st.image(img, width=260)
+                st.image(img, width=260, caption="Gambar yang diupload")
             with col2:
                 pred, conf = predict(preprocess_image(img))
                 show_result(pred, conf)
@@ -161,3 +161,4 @@ st.markdown("""
 ✨ Undertone Finder · Streamlit App ✨
 </div>
 """, unsafe_allow_html=True)
+
