@@ -18,73 +18,30 @@ st.markdown("""
     background-color: #fffafc;
     font-family: 'Segoe UI', sans-serif;
 }
-
-/* SIDEBAR */
 section[data-testid="stSidebar"] {
     background-color: #ffe6f0;
-    padding-top: 20px;
 }
-
-/* SIDEBAR TEXT */
 section[data-testid="stSidebar"] * {
     color: #b83280 !important;
-    font-weight: 500;
 }
-
-/* SELECTBOX */
-div[data-baseweb="select"] > div {
-    background-color: #fff0f6;
-    border-radius: 14px;
-    border: 1px solid #ffadd2;
-}
-
-/* BUTTON */
-.stButton > button {
-    background: linear-gradient(90deg, #ff85c0, #ff4da6);
-    color: white;
-    border-radius: 30px;
-    border: none;
-    padding: 0.6em 1.4em;
-    font-size: 16px;
-}
-
-/* BUTTON HOVER */
-.stButton > button:hover {
-    background: linear-gradient(90deg, #ff4da6, #c41d7f);
-}
-
-/* CARD */
 .card {
     background: white;
     padding: 25px;
     border-radius: 25px;
     box-shadow: 0 8px 25px rgba(255, 77, 166, 0.15);
-    margin-top: 20px;
-    margin-bottom: 30px;
+    margin: 20px 0;
 }
-
-/* BADGE */
 .badge {
-    display: inline-block;
     background: #ff4da6;
     color: white;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 14px;
-    margin-bottom: 10px;
 }
-
-/* IMAGE */
-img {
-    border-radius: 18px;
-}
-
-/* FOOTER */
 .footer {
     text-align: center;
     color: #c41d7f;
-    margin-top: 50px;
-    font-size: 14px;
+    margin-top: 40px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -94,14 +51,14 @@ img {
 def load_model_and_encoder():
     model = tf.keras.models.load_model("model2.h5")
     with open("label_encoder2.pkl", "rb") as f:
-        label_encoder = pickle.load(f)
-    return model, label_encoder
+        le = pickle.load(f)
+    return model, le
 
 model, label_encoder = load_model_and_encoder()
 
 # ================== FUNCTIONS ==================
-def preprocess_image(image, target_size=(64, 64)):
-    image = image.resize(target_size)
+def preprocess_image(image, size=(64, 64)):
+    image = image.resize(size)
     img = np.array(image).astype("float32") / 255.0
     return np.expand_dims(img, axis=0)
 
@@ -111,10 +68,7 @@ def predict(image_array):
     return label_encoder.inverse_transform([idx])[0], probs[idx]
 
 # ================== SIDEBAR ==================
-menu = st.sidebar.selectbox(
-    "🌸 Navigasi",
-    ["HOME", "CHECK YOUR UNDERTONE"]
-)
+menu = st.sidebar.selectbox("🌸 Menu", ["HOME", "CHECK YOUR UNDERTONE"])
 
 # ================== HOME ==================
 if menu == "HOME":
@@ -122,107 +76,84 @@ if menu == "HOME":
     st.markdown("""
     <div class="card">
     <span class="badge">Apa itu Undertone?</span>
-    <p>
-    Undertone adalah warna dasar alami kulitmu yang tidak berubah meskipun kulitmu
-    menjadi lebih gelap atau terang.
-    </p>
-
-    <b>Kenapa penting?</b>
+    <p>Undertone adalah warna dasar alami kulit yang tidak berubah.</p>
     <ul>
-        <li>Makeup jadi lebih nyatu</li>
-        <li>Warna baju lebih flattering</li>
-        <li>Perhiasan terlihat lebih cocok</li>
+        <li>Makeup lebih nyatu</li>
+        <li>Baju lebih flattering</li>
+        <li>Aksesori makin cocok</li>
     </ul>
     </div>
     """, unsafe_allow_html=True)
 
-    st.image("undertone.png", width=450)
-    st.markdown("👉 Pilih menu <b>CHECK YOUR UNDERTONE</b> di sidebar", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.image("undertone.png", width=420)
+    st.markdown("👉 Pilih menu <b>CHECK YOUR UNDERTONE</b>", unsafe_allow_html=True)
 
 # ================== CHECK UNDERTONE ==================
 else:
     st.markdown("## 🔍 Deteksi Undertone Kulit")
-
     tab1, tab2 = st.tabs(["📁 Upload Gambar", "📷 Kamera"])
+
+    def show_result(pred, conf):
+        pred = pred.strip().capitalize()
+
+        st.markdown(f"""
+        <div class="card">
+        <span class="badge">Hasil Deteksi</span>
+        <h3>Undertone kamu: <b>{pred}</b></h3>
+        <p>Confidence: <b>{conf*100:.2f}%</b></p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("### 💖 Rekomendasi Warna")
+
+        if pred == "Cool":
+            st.markdown("""
+            ✔ <span style="color:#1f77b4"><b>Biru</b></span>,
+            <span style="color:#6a0dad"><b>Ungu</b></span>,
+            <span style="color:#7f7f7f"><b>Abu-abu</b></span>,
+            <span style="color:#c0c0c0"><b>Silver</b></span>
+            """, unsafe_allow_html=True)
+            st.image("COOL.png", width=240)
+
+        elif pred == "Warm":
+            st.markdown("""
+            ✔ <span style="color:#f1c40f"><b>Kuning</b></span>,
+            <span style="color:#8b4513"><b>Coklat</b></span>,
+            <span style="color:#d4af37"><b>Emas</b></span>,
+            <span style="color:#808000"><b>Olive</b></span>
+            """, unsafe_allow_html=True)
+            st.image("WARM.png", width=240)
+
+        else:
+            st.markdown("""
+            ✔ <span style="color:#d2b48c"><b>Beige</b></span>,
+            <span style="color:#ffb7c5"><b>Peach</b></span>,
+            <span style="color:#ff69b4"><b>Pink</b></span>,
+            <span style="color:#98ff98"><b>Mint</b></span>
+            """, unsafe_allow_html=True)
+            st.image("NEUTRAL.png", width=240)
 
     # ===== UPLOAD =====
     with tab1:
-        uploaded_file = st.file_uploader(
-            "Upload gambar nadi (jpg / png)",
-            type=["jpg", "jpeg", "png"]
-        )
-
-        if uploaded_file:
+        file = st.file_uploader("Upload gambar (jpg/png)", type=["jpg", "png", "jpeg"])
+        if file:
             col1, col2 = st.columns([1, 1.4])
-
             with col1:
-                image = Image.open(uploaded_file).convert("RGB")
-                st.image(image, width=260, caption="Gambar yang diupload")
-
+                img = Image.open(file).convert("RGB")
+                st.image(img, width=260)
             with col2:
-                processed = preprocess_image(image)
-                pred, conf = predict(processed)
-
-                st.markdown(f"""
-                <div class="card">
-                <span class="badge">Hasil Deteksi</span>
-                <h3>Undertone kamu: <b>{pred}</b></h3>
-                <p>Tingkat keyakinan model: <b>{conf*100:.2f}%</b></p>
-                </div>
-                """, unsafe_allow_html=True)
-
-    st.markdown("### 💖 Rekomendasi Warna")
-
-pred = pred.strip().capitalize()
-
-if pred == "Cool":
-    st.markdown("""
-    ✔ 
-    <span style="color:#1f77b4;"><b>Biru</b></span>, 
-    <span style="color:#6a0dad;"><b>Ungu</b></span>, 
-    <span style="color:#7f7f7f;"><b>Abu-abu</b></span>, 
-    <span style="color:#c0c0c0;"><b>Silver</b></span>
-    """, unsafe_allow_html=True)
-    st.image("COOL.png", width=260)
-
-elif pred == "Warm":
-    st.markdown("""
-    ✔ 
-    <span style="color:#f1c40f;"><b>Kuning</b></span>, 
-    <span style="color:#8b4513;"><b>Coklat</b></span>, 
-    <span style="color:#d4af37;"><b>Emas</b></span>, 
-    <span style="color:#808000;"><b>Olive</b></span>
-    """, unsafe_allow_html=True)
-    st.image("WARM.png", width=260)
-
-else:
-    st.markdown("""
-    ✔ 
-    <span style="color:#d2b48c;"><b>Beige</b></span>, 
-    <span style="color:#ffb7c5;"><b>Peach</b></span>, 
-    <span style="color:#ff69b4;"><b>Pink</b></span>, 
-    <span style="color:#98ff98;"><b>Mint</b></span>
-    """, unsafe_allow_html=True)
-    st.image("NEUTRAL.png", width=260)
-
+                pred, conf = predict(preprocess_image(img))
+                show_result(pred, conf)
 
     # ===== CAMERA =====
     with tab2:
-        camera_image = st.camera_input("Ambil gambar dari kamera")
-
-        if camera_image:
-            image = Image.open(camera_image).convert("RGB")
-            st.image(image, width=260)
-
-            processed = preprocess_image(image)
-            pred, conf = predict(processed)
-
-            st.markdown(f"""
-            <div class="card">
-            <h3>✨ Undertone kamu: <b>{pred}</b></h3>
-            <p>Confidence: <b>{conf*100:.2f}%</b></p>
-            </div>
-            """, unsafe_allow_html=True)
+        cam = st.camera_input("Ambil gambar")
+        if cam:
+            img = Image.open(cam).convert("RGB")
+            st.image(img, width=260)
+            pred, conf = predict(preprocess_image(img))
+            show_result(pred, conf)
 
 # ================== FOOTER ==================
 st.markdown("""
@@ -230,7 +161,3 @@ st.markdown("""
 ✨ Undertone Finder · Streamlit App ✨
 </div>
 """, unsafe_allow_html=True)
-
-
-
-
